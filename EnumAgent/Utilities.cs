@@ -70,6 +70,33 @@ namespace EnumAgent
 		}
 
 		/// <summary>
+		/// Convert given constant to given enum identifier and returns enumconstant as integer
+		/// </summary>
+		/// <param name="enumName">String enum identified</param>
+		/// <param name="enumConstant">String enum constant value</param>
+		/// <returns>int</returns>
+		public static int ConvertFromString(string enumName, string enumConstant)
+		{
+			var val = 0;
+
+			try
+			{
+				enumConstant = Helper.replaceTurkishChars(enumConstant);
+
+				var type = Type.GetType(enumName);
+				var obj = Enum.Parse(type, enumConstant);
+
+				val = Convert.ToInt32(obj);
+			}
+			catch (Exception ex)
+			{
+				var msg = ex.Message;
+			}
+
+			return val;
+		}
+
+		/// <summary>
 		/// Parse given string to Enum
 		/// </summary>
 		/// <typeparam name="T">Enum identifier</typeparam>
