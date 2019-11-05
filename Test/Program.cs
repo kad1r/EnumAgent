@@ -12,11 +12,12 @@ namespace Test
 
 			var sessionValue = Utilities.GetValue(CacheEnum.Session);
 			var isDefined = Utilities.IsDefined<CacheEnum>("HttpCache");
-			var cacheNames = Utilities.GetNamesWithValues(CacheEnum.HttpCache);
+			var cacheNames = Utilities.GetNamesWithValues(typeof(CacheEnum));
+			var cacheDescriptions = Utilities.GetDescriptionWithValues(typeof(CacheEnum));
 			var parse = Utilities.Parse<CacheEnum>("Session");
-			var displayName = Utilities.GetDisplayName(typeof(CacheEnum), (int)CacheEnum.MemCache);
-			var description = Utilities.GetDescription(typeof(CacheEnum), (int)CacheEnum.HttpCache);
-			var list = Utilities.ConvertToSelectListItem(typeof(CacheEnum));
+			var displayName = Utilities.GetDisplayName<CacheEnum>((int)CacheEnum.MemCache);
+			var description = Utilities.GetDescription<CacheEnum>((int)CacheEnum.HttpCache);
+			var list = Utilities.ConvertToSelectListItem<CacheEnum>();
 
 			Console.WriteLine("MemCache DisplayName -> " + displayName);
 			Console.WriteLine("HttpCache Description -> " + description);

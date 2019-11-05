@@ -10,9 +10,16 @@ namespace EnumAgent
 {
 	public static class Utilities
 	{
-		public static string GetDisplayName(Type type, int value)
+		/// <summary>
+		/// Get display attribute of given int value for enum
+		/// </summary>
+		/// <typeparam name="T">Enum identifier</typeparam>
+		/// <param name="value">Value of your enum</param>
+		/// <returns>string</returns>
+		public static string GetDisplayName<T>(int value) where T : struct
 		{
 			var output = string.Empty;
+			var type = typeof(T);
 			var name = Enum.GetName(type, value);
 			var member = type.GetMember(name)[0];
 			var attributes = member.GetCustomAttributes(typeof(DisplayAttribute), false);
@@ -30,9 +37,16 @@ namespace EnumAgent
 			return output;
 		}
 
-		public static string GetDescription(Type type, int value)
+		/// <summary>
+		/// Get description attribute name of given int value for enum
+		/// </summary>
+		/// <typeparam name="T">Enum identifier</typeparam>
+		/// <param name="value">Value of your enum</param>
+		/// <returns>string</returns>
+		public static string GetDescription<T>(int value) where T : struct
 		{
 			var output = string.Empty;
+			var type = typeof(T);
 			var name = Enum.GetName(type, value);
 			var member = type.GetMember(name)[0];
 			var attributes = member.GetCustomAttributes(typeof(DescriptionAttribute), false);
@@ -45,11 +59,22 @@ namespace EnumAgent
 			return output;
 		}
 
+		/// <summary>
+		/// Get int value of given enum
+		/// </summary>
+		/// <param name="_enum">Enum object</param>
+		/// <returns>int</returns>
 		public static int GetValue(Enum _enum)
 		{
 			return Convert.ToInt32(_enum, CultureInfo.InvariantCulture.NumberFormat);
 		}
 
+		/// <summary>
+		/// Parse given string to Enum
+		/// </summary>
+		/// <typeparam name="T">Enum identifier</typeparam>
+		/// <param name="enumtext">Text of your enum</param>
+		/// <returns>Enum</returns>
 		public static T Parse<T>(string enumtext) where T : struct
 		{
 			if (IsDefined<T>(enumtext))
@@ -62,11 +87,23 @@ namespace EnumAgent
 			return (T)Enum.ToObject(typeof(T), 0);
 		}
 
+		/// <summary>
+		/// Checks if given string is defined in your Enum
+		/// </summary>
+		/// <typeparam name="T">Enum identifier</typeparam>
+		/// <param name="enumtext">Text of your enum</param>
+		/// <returns>bool</returns>
 		public static bool IsDefined<T>(string enumtext) where T : struct
 		{
 			return Enum.GetNames(typeof(T)).Contains(enumtext);
 		}
 
+		/// <summary>
+		/// Checks if given int is defined in your Enum
+		/// </summary>
+		/// <typeparam name="T">Enum identifier</typeparam>
+		/// <param name="value">Some integer value</param>
+		/// <returns>bool</returns>
 		public static bool IsDefined<T>(int value)
 		{
 			var vals = (int[])Enum.GetValues(typeof(T));
@@ -82,10 +119,14 @@ namespace EnumAgent
 			return false;
 		}
 
-		public static Dictionary<int, string> GetNamesWithValues(Enum _enum)
+		/// <summary>
+		/// Get display attributes of the given Enum type, takes name if there is no display attribute
+		/// </summary>
+		/// <param name="type">Enum type</param>
+		/// <returns>Dictionary</returns>
+		public static Dictionary<int, string> GetNamesWithValues(Type type)
 		{
 			var list = new Dictionary<int, string>();
-			var type = _enum.GetType();
 			var values = Enum.GetValues(type);
 
 			foreach (var value in values)
@@ -109,6 +150,11 @@ namespace EnumAgent
 			return list;
 		}
 
+		/// <summary>
+		/// Get description attributes of the given Enum type. Takes name if there is no description attribute
+		/// </summary>
+		/// <param name="type">Enum type</param>
+		/// <returns>Dictionary</returns>
 		public static Dictionary<int, string> GetDescriptionWithValues(Type type)
 		{
 			var list = new Dictionary<int, string>();
@@ -117,26 +163,39 @@ namespace EnumAgent
 			foreach (var value in values)
 			{
 				var field = type.GetField(value.ToString());
-				var f = field.GetCustomAttributes(typeof(DescriptionAttribute), true);
+				var attrs = field.GetCustomAttributes(typeof(DescriptionAttribute), true);
 
-				foreach (DescriptionAttribute a in f)
+				if (attrs != null && attrs.Count() > 0)
 				{
-					list.Add((int)value, a.Description);
+					foreach (DescriptionAttribute a in attrs)
+					{
+						list.Add((int)value, a.Description);
+					}
+				}
+				else
+				{
+					list.Add((int)value, field.Name);
 				}
 			}
 
 			return list;
 		}
 
-		public static List<SelectListItem> ConvertToSelectListItem(Type type)
+		/// <summary>
+		/// Converts Enum object to SelectListItem. You can cast return value to MVC SelectListItem
+		/// </summary>
+		/// <typeparam name="T">Enum identifier</typeparam>
+		/// <returns>List</returns>
+		public static List<SelectListItem> ConvertToSelectListItem<T>() where T : struct
 		{
 			var list = new List<SelectListItem>();
+			var type = typeof(T);
 
 			foreach (var _enum in Enum.GetValues(type))
 			{
 				list.Add(new SelectListItem
 				{
-					Text = GetDescription(type, (int)_enum),
+					Text = GetDescription<T>((int)_enum),
 					Value = _enum.ToString()
 				});
 			}
